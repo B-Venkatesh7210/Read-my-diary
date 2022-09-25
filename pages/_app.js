@@ -10,6 +10,8 @@ import React, { useEffect } from "react";
 import { useAccount, useSigner, useContract, useProvider } from "wagmi";
 import { useDiaryStore } from "../state/store";
 import contractConfig from "../contractConfig.json";
+import * as dotenv from 'dotenv'
+dotenv.config()
 import Router from "next/router";
 
 const { chains, provider } = configureChains(

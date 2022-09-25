@@ -20,15 +20,16 @@ const WritePage = () => {
   const provider = useProvider();
   const router = useRouter();
 
-  const PK = "your_channel_address_secret_key"; // channel private key
+  const PK = process.env.PK; // channel private key
   const Pkey = `0x${PK}`;
-  const signer2 = new ethers.Wallet(Pkey);
+  // const signer2 = new ethers.Wallet(Pkey);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const diaryId = searchParams.get("diaryId");
     setDiaryId(diaryId);
     console.log(diaryId);
+    console.log(PK);
   }, []);
 
   const writingPage = async () => {

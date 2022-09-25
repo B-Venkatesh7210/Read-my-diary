@@ -1,10 +1,13 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import Head from "next/head";
+import React, {useEffect} from "react";
 import { useRouter } from "next/router";
 import {Router} from "react-router-dom"
 import Navbar from "../components/Navbar";
 
+
 const LandingPage = () => {
+
   const router = useRouter();
 
   return (

@@ -1,15 +1,21 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useRouter } from "next/dist/client/router";
+import Image from "next/image";
 
 const Navbar = () => {
 
     const router = useRouter();
 
   return (
-    <div className="w-full h-1/7 bg-red-500 flex flex-row justify-between px-2 py-4">
-      <div>Hello</div>
-      <button className="w-80 h-25 bg-blue-400 rounded-lg" onClick={() => {router.push("/")}}>Read My Diary</button>
-      <ConnectButton showBalance={false}></ConnectButton>
+    <div className="w-full h-auto flex flex-row justify-between items-center px-10 py-4">
+      <Image alt="logo" src="/images/Logo.png" className="cursor-pointer" width={180} height={115} onClick={() => {
+        router.push("/")
+      }}></Image>
+      <div className="h-40flex flex-row justify-center items-center">
+      <span className="title cursor-pointer" style={{fontSize: "60px"}} onClick={() => {router.push("/Home")}}>Read My Diary</span>
+      </div>
+      
+      <ConnectButton showBalance={true}></ConnectButton>
     </div>
   );
 };

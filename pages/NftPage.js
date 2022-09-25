@@ -3,9 +3,10 @@ import { NFTStorage, File } from "nft.storage";
 import { useRouter } from "next/router";
 import { useAccount, useSigner, useContract } from "wagmi";
 import { useDiaryStore } from "../state/store";
-import Image from "next/image";
 import nftContractConfig from "../nftContractConfig.json";
 import html2canvas from "html2canvas";
+import Navbar from "../components/Navbar";
+import Image from "next/image";
 import NftComponent from "../components/NftComponent";
 
 const NftPage = () => {
@@ -13,7 +14,7 @@ const NftPage = () => {
   const router = useRouter();
   const allDiaries = useDiaryStore((state) => state.allDiaries);
   const { data: signer, isError, isLoading } = useSigner();
-  const diaryId = router.query.diaryId;
+  const [diaryId, setDiaryId] = useState();
   const printRef = React.useRef();
   const nftContract = useContract({
     addressOrName: nftContractConfig.address,
@@ -22,8 +23,8 @@ const NftPage = () => {
   });
 
   useEffect(() => {
-    console.log({ allDiaries: allDiaries[diaryId] });
-  }, []);
+    console.log({ allDiaries });
+  }, [allDiaries]);
 
   const client = new NFTStorage({
     token:
@@ -35,16 +36,24 @@ const NftPage = () => {
     const canvas = await html2canvas(element);
 
     canvas.toBlob(async (blob) => {
-      let file = new File([blob], "ReadMyDiaryNFT.png", { type: "image/png" });
+      let file = new File(
+        [blob],
+        `ReadMyDiaryNFT_${allDiaries[diaryId].diaryName}.png`,
+        { type: "image/png" }
+      );
+      console.log(file);
+      var url = window.URL.createObjectURL(file);
+      window.location.assign(url);
+
       const metadata = await client.store({
-        name: "Read My Diary NFT",
+        name: `${allDiaries[diaryId].diaryName} NFT`,
         image: file,
-        description: "trial NFT",
+        description: `${allDiaries[diaryId].description}`,
       });
 
       console.log("metadata:", metadata.ipnft);
       try {
-        const createToken = nftContract.createToken(metadata.url, 1);
+        const createToken = nftContract.createToken(metadata.url, diaryId);
 
         // createToken.on("transactionHash", (hash) => {
         //   console.log(hash);
@@ -60,38 +69,32 @@ const NftPage = () => {
     });
   };
 
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const diaryId = searchParams.get("diaryId");
+    setDiaryId(diaryId);
+  }, []);
+
   return (
-    <div className="flex flex-col h-screen w-1/2 bg-red-500 top-1/2 left-1/2">
-      <button
-        className="w-20 h-10 bg-blue-300 rounded"
-        onClick={() => {
-          console.log(address);
-        }}
-      >
-        Click Here
-      </button>{" "}
-      {/* <Image
-          alt="Nft"
-          src="/images/NftImage.jpg"
-          width="280"
-          height="220"
-        ></Image> */}
-      <div ref={printRef} className="w-1/3 h-1/2 bg-blue-500 flex flex-col justify-center items-center p-10">
-        <Image
-          alt="Nft"
-          src="/images/NftImage.jpg"
-          width="200"
-          height="200"
-        ></Image>
+    <div className="background h-screen w-full noScrollbar overflow-auto flex flex-col justify-start items-center">
+      <Navbar />
+      <div className="h-5/6 w-3/5 flex flex-row justify-around items-center">
+        <div ref={printRef}>
+          <NftComponent diary={allDiaries[diaryId]} />
+        </div>
+        <div className="h-2/5 flex flex-col justify-center items-center">
+          <button
+            className="button w-48 flex flex-row justify-center items-center mt-4"
+            style={{
+              fontSize: "24px",
+              height: "60px",
+              borderRadius: "20px",
+            }}
+          >
+            <span className="title text-2xl" onClick={handleDownloadImage}>Mint NFT</span>
+          </button>
+        </div>
       </div>
-      <button
-        className="w-20 h-20 bg-blue-300 rounded"
-        onClick={handleDownloadImage}
-      >
-        Mint your NFT
-      </button>
-      {/* <span>Diary Name: {allDiaries[diaryId].diaryName}</span>
-      <span>Diary Author: {allDiaries[diaryId].author}</span> */}
     </div>
   );
 };

@@ -72,6 +72,8 @@ const Home = () => {
           diaryName: "",
           fee: "",
         });
+
+        router.reload(window.location.pathname)
       } catch (error) {
         console.log(error);
       }

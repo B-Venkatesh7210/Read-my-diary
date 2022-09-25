@@ -7,6 +7,7 @@ import Navbar from "../components/Navbar";
 import { getEllipsisTxt } from "../helpers/formatters";
 import { ethers } from "ethers";
 import Moment from "react-moment";
+import Image from "next/image";
 
 const Diary = () => {
   const { isConnected, address } = useAccount();
@@ -15,6 +16,7 @@ const Diary = () => {
   const [diaryPages, setDiaryPages] = useState([]);
   const [diaryId, setDiaryId] = useState();
   const [hasReadPage, setHasReadPage] = useState([]);
+  const [isEligible, setIsEligible] = useState();
 
   const allDiaries = useDiaryStore((state) => state.allDiaries);
   // const diaryId = router.query.diaryId;
@@ -105,10 +107,17 @@ const Diary = () => {
       setHasReadPage(arr);
     };
 
+    const isEligibleNft = async () => {
+      const isEligible = await contract.isEligibleForNft(address, diaryId);
+      console.log(isEligible);
+      setIsEligible(isEligible);
+    };
+
     if (isConnected && diaryId && signer) {
       console.log(diaryId);
       getDiaryPages();
       hasReadPage();
+      isEligibleNft();
     }
   }, [diaryId, signer, isConnected]);
 
@@ -197,13 +206,19 @@ const Diary = () => {
           style={{ height: "32rem" }}
         >
           <div className="w-full flex flex-row justify-between items-center">
-            <div className="flex flex-row justify-start items-baseline">
+            <div className="w-2/6 flex flex-row justify-start items-baseline">
               <span className="title" style={{ fontSize: "26px" }}>
                 Page Fee
               </span>
-              <span className="title2 ml-5" style={{ fontSize: "32px" }}>
+              <span className="title2 ml-5 mr-4" style={{ fontSize: "32px" }}>
                 {allDiaries[diaryId]?.pageFee / 10 ** 18}
               </span>
+              <Image
+                alt="Matic"
+                src="/images/Matic.png"
+                width={30}
+                height={30}
+              ></Image>
             </div>
             <div className="flex flex-row justify-start items-baseline">
               <span className="title2 ml-5" style={{ fontSize: "32px" }}>
@@ -284,26 +299,25 @@ const Diary = () => {
               </button>
             ) : (
               <button
-                className="button w-48 flex flex-row justify-center items-center mt-4"
+                className="button w-48 flex flex-col justify-center items-center mt-4"
                 style={{
                   fontSize: "24px",
                   height: "60px",
                   borderRadius: "20px",
                 }}
-              >
-                <span
-                  className="title text-2xl"
-                  onClick={() => {
+                onClick={() => {
+                  isEligible &&
                     router.push({
                       pathname: "/NftPage",
                       query: {
                         diaryId: diaryId,
                       },
                     });
-                  }}
-                >
-                  Mint NFT
-                </span>
+                }}
+                disabled={!isEligible}
+              >
+                <span className="title text-2xl">Mint NFT</span>
+                {!isEligible && <span className="title text-xs">{"You're not eligible"}</span> }
               </button>
             )}
           </div>

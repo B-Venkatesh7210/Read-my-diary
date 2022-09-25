@@ -1,5 +1,6 @@
 import React from "react";
 import { getEllipsisTxt } from "../helpers/formatters";
+import Image from "next/image";
 
 const DiaryComponent = ({ diary }) => {
 
@@ -33,9 +34,10 @@ const DiaryComponent = ({ diary }) => {
               <span className="title" style={{ fontSize: "16px" }}>
                 Page Fee:
               </span>
-              <span className="title2 ml-2">
+              <span className="title2 ml-2 mr-3">
               {pageFee}
               </span>
+              <Image alt="Matic" src="/images/Matic.png" width={20} height={20}></Image>
             </div>
           </div>
         </div>

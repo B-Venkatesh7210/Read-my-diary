@@ -7,6 +7,7 @@ import { useRouter } from "next/router";
 import * as EpnsAPI from "@epnsproject/sdk-restapi";
 import * as ethers from "ethers";
 import { parseEther } from "ethers/lib/utils";
+import { getEllipsisTxt } from "../helpers/formatters";
 
 const WritePage = () => {
   const allDiaries = useDiaryStore((state) => state.allDiaries);
@@ -22,14 +23,59 @@ const WritePage = () => {
 
   const PK = process.env.PK; // channel private key
   const Pkey = `0x${PK}`;
-  // const signer2 = new ethers.Wallet(Pkey);
+  const signer2 = new ethers.Wallet(Pkey);
+
+  const sendNotification = async () => {
+    try {
+      console.log(signer2);
+      const apiResponse = await EpnsAPI.payloads.sendNotification({
+        // signer2,
+        // type: 4, // target
+        // identityType: 1, // direct payload
+        // // notification: {
+        // //   title: `New Page by ${getEllipsisTxt(allDiaries[diaryId]?.author)}`,
+        // //   body: `${getEllipsisTxt(allDiaries[diaryId]?.author)} has written page no. ${allDiaries[diaryId]?.totalPages.toString()}`,
+        // //   cta: '',
+        // //   img: ''
+        // // },
+        // //   payload: {
+        // //     title: `New Page by ${getEllipsisTxt(allDiaries[diaryId]?.author)}`,
+        // //     body: `${getEllipsisTxt(allDiaries[diaryId]?.author)} has written page no. ${allDiaries[diaryId]?.totalPages.toString()}`,
+        // //   },
+        // ipfsHash: 'bafkreicuttr5gpbyzyn6cyapxctlr7dk2g6fnydqxy6lps424mcjcn73we',
+        // recipients: "0xF2B7CfDb834Bf075144ca9E309Ff0AE0B7860AC8", // recipient address
+        // channel: 'eip155:42:0x4562F39FAEEdB490B3Bf0D6024F46DBD5c40cF04', // your channel address
+        // env: 'staging'
+        signer2,
+        type: 3, // target
+        identityType: 2, // direct payload
+        notification: {
+          title: `[SDK-TEST] notification TITLE:`,
+          body: `[sdk-test] notification BODY`,
+        },
+        payload: {
+          title: `[sdk-test] payload title`,
+          body: `sample msg body`,
+          cta: "",
+          img: "",
+        },
+        recipients: "eip155:42:0x4562F39FAEEdB490B3Bf0D6024F46DBD5c40cF04", // recipient address
+        channel: "eip155:42:0x4562F39FAEEdB490B3Bf0D6024F46DBD5c40cF04", // your channel address
+        env: "staging",
+      });
+
+      // apiResponse?.status === 204, if sent successfully!
+      console.log("API repsonse: ", apiResponse);
+    } catch (err) {
+      console.error("Error: ", err);
+    }
+  };
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const diaryId = searchParams.get("diaryId");
     setDiaryId(diaryId);
     console.log(diaryId);
-    console.log(PK);
   }, []);
 
   const writingPage = async () => {
@@ -37,6 +83,7 @@ const WritePage = () => {
       alert("Connect your Wallet");
     } else {
       try {
+        // sendNotification();
         const contract = new ethers.Contract(
           contractConfig.address,
           contractConfig.abi,
@@ -47,6 +94,7 @@ const WritePage = () => {
           value: ethers.utils.parseEther(writingFee.toString()),
         });
         await txn.wait();
+
         router.push("/Home");
       } catch (error) {
         console.log(error);
@@ -55,14 +103,14 @@ const WritePage = () => {
   };
 
   useEffect(() => {
-    if (isConnected && diaryId && signer) {
+    if (isConnected && diaryId && signer && allDiaries) {
       const totalPages =
         parseInt(allDiaries[diaryId]?.totalPages.toString()) + 1;
       console.log(totalPages);
       const totalPages2 = totalPages.toString();
       console.log(totalPages2);
       setTotalPages(totalPages2);
-      console.log(signer._address);
+      console.log(allDiaries[diaryId]?.author);
     }
   }, [isConnected, diaryId, allDiaries, signer]);
 

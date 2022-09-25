@@ -27,9 +27,11 @@ const NftComponent = ({diary}) => {
               <span className="title3" style={{ fontSize: "20px" }}>
                 Page Fee
               </span>
-              <span className="title4 ml-3" style={{ fontSize: "32px" }}>
-                {diary?.pageFee.toString()}
+              <span className="title4 ml-3 mr-4" style={{ fontSize: "32px" }}>
+                {diary?.pageFee.toString()/10**18}
               </span>
+              <Image alt="Matic" src="/images/Matic.png" width={30} height={30}>
+              </Image>
             </div>
             <div className="flex flex-row justify-start items-baseline">
               <span className="title3" style={{ fontSize: "20px" }}>

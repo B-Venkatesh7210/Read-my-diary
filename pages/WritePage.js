@@ -21,9 +21,9 @@ const WritePage = () => {
   const provider = useProvider();
   const router = useRouter();
 
-  const PK = process.env.PK; // channel private key
-  const Pkey = `0x${PK}`;
-  const signer2 = new ethers.Wallet(Pkey);
+  // const PK = process.env.PK; // channel private key
+  // const Pkey = `0x${PK}`;
+  // const signer2 = new ethers.Wallet(Pkey);
 
   const sendNotification = async () => {
     try {

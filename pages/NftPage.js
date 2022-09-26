@@ -17,6 +17,7 @@ const NftPage = () => {
   const { data: signer, isError, isLoading } = useSigner();
   const [diaryId, setDiaryId] = useState();
   const [isEligible, setIsEligible] = useState();
+  const [nftMinted, setNftMinted] = useState();
   const printRef = React.useRef();
   const nftContract = useContract({
     addressOrName: nftContractConfig.address,
@@ -62,16 +63,18 @@ const NftPage = () => {
 
       console.log("metadata:", metadata.ipnft);
       try {
-        const createToken = nftContract.createToken(metadata.url, diaryId);
+        const createToken = await nftContract.createToken(metadata.url, diaryId);
 
-        createToken.on("transactionHash", (hash) => {
-          console.log(hash);
-        });
+        // createToken.on("transactionHash", (hash) => {
+        //   console.log(hash);
+        // });
 
-        createToken.on("error", (error, recipt) => {
-          console.log(error);
-          alert(error);
-        });
+        // createToken.on("error", (error, recipt) => {
+        //   console.log(error);
+        //   alert(error);
+        // });
+        await createToken.wait();
+        router.push("/Home");
       } catch (error) {
         alert(error.message);
       }
@@ -90,17 +93,24 @@ const NftPage = () => {
       console.log(isEligible);
       setIsEligible(isEligible);
     };
+
+    const getNftMinted = async () => {
+      const nftMinted = await nftContract.nftMinted(diaryId, address);
+      console.log(nftMinted);
+      setNftMinted(nftMinted);
+    }
     if (isConnected && diaryId && signer) {
       isEligibleNft();
+      getNftMinted();
+
       console.log(diaryId, isEligible)
-      console.log(address)
     }
   }, [diaryId, signer, isConnected]);
 
   return (
     <div className="background h-screen w-full noScrollbar overflow-auto flex flex-col justify-start items-center">
       <Navbar />
-      {isEligible ? (
+      {isEligible && nftMinted==false ? (
         <div className="h-5/6 w-3/5 flex flex-row justify-around items-center">
           <div ref={printRef}>
             <NftComponent diary={allDiaries[diaryId]} />

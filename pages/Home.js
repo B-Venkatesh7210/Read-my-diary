@@ -107,6 +107,11 @@ const Home = () => {
       console.log({ readingDiaries });
       setReadingDiaries(readingDiaries);
     };
+
+    // const getEnsName = async () => {
+    //   const web3 = await getWeb3
+    // }
+
     if (isConnected) {
       getMyDiaries();
       getReadingDiaries();
